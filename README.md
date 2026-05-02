@@ -1,6 +1,6 @@
 # Kubernetes
 This repository hosts the Kubernetes resources yaml-files that aren't tied to any single microserver in particular, but rather
-are either cluster-wide or project wide. Is it possible to recreate the state of the cluster by simply applying such resources.
+are either cluster-wide or project wide. It is possible to recreate the state of the cluster by simply applying such resources.
 
 ### Prerequisites
 You need to have a kubernetes distribution up & running, correctly configured with your local instance of kubectl. Given that, you 
