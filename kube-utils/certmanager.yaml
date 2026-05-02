@@ -1,0 +1,57 @@
+#---------------------------------------#
+#            HELM REPOSITORY            #
+#---------------------------------------#
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: certmanager-repo
+  namespace: kube-utils
+spec:
+  interval: 1m
+  url: https://charts.jetstack.io
+
+#----------------------------------------#
+#              HELM RELEASE              #
+#----------------------------------------#
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: certmanager-operator
+  namespace: kube-utils
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: cert-manager
+      version: v1.19.2
+      sourceRef:
+        kind: HelmRepository
+        name: certmanager-repo
+  targetNamespace: kube-utils
+  install:
+    createNamespace: false
+  values:
+    installCRDs: true
+    fullnameOverride: certmanager-controller
+
+#--------------------------------------#
+#            CONFIGURATION             #
+#--------------------------------------#
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: certmanager-issuer
+  namespace: kube-utils
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: francescodero@outlook.it
+    privateKeySecretRef:
+      name: certmanager-acme-secret
+    solvers:
+    - http01:
+        ingress:
+          class: traefik
