@@ -41,7 +41,9 @@ spec:
       tag: "4.1.3-debian-12-r1"
     replicaCount: 1
     auth:
-      enabled: false
+      username: microchess
+      password: microchess
+      erlangCookie: microchess
     persistence:
       enabled: true
       storageClass: longhorn
