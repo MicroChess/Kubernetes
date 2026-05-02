@@ -1,0 +1,57 @@
+#---------------------------------------#
+#            HELM REPOSITORY            #
+#---------------------------------------#
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: rabbitmq-repo
+  namespace: microchess
+spec:
+  interval: 12h
+  url: https://charts.bitnami.com/bitnami
+
+#----------------------------------------#
+#              HELM RELEASE              #
+#----------------------------------------#
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: rabbitmq-ss
+  namespace: microchess
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: rabbitmq
+      version: ">=14.0.0 <15.0.0"
+      sourceRef:
+        kind: HelmRepository
+        name: rabbitmq-repo
+        namespace: microchess
+  values:
+    replicaCount: 1
+    auth:
+      username:     microchess
+      password:     microchess
+      erlangCookie: microchess
+    persistence:
+      enabled: true
+      storageClass: longhorn
+      size: 5Gi
+      accessModes:
+        - ReadWriteOnce
+    resources:
+      requests:
+        cpu: 250m
+        memory: 256Mi
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+    livenessProbe:
+      enabled: true
+    readinessProbe:
+      enabled: true
+    metrics:
+      enabled: false
