@@ -1,0 +1,60 @@
+#---------------------------------------#
+#            HELM REPOSITORY            #
+#---------------------------------------#
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: longhorn-repo
+  namespace: kube-utils
+spec:
+  interval: 1m
+  url: https://charts.longhorn.io
+
+#----------------------------------------#
+#              HELM RELEASE              #
+#----------------------------------------#
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: longhorn-operator
+  namespace: kube-utils
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: longhorn
+      version: '1.10.1'
+      sourceRef:
+        kind: HelmRepository
+        name: longhorn-repo
+  targetNamespace: kube-utils
+  install:
+    createNamespace: false
+  values:
+    defaultSettings:
+      defaultDataPath: /var/lib/longhorn/
+      replicaSoftAntiAffinity: true
+      upgradeChecker: false
+      defaultReplicaCount: 2
+      priorityClass: high-priority
+      autoSalvage: false
+      disableSchedulingOnCordonedNode: true
+      replicaZoneSoftAntiAffinity: true
+      replicaDiskSoftAntiAffinity: true
+      #backupTarget: s3://backupbucket@us-east-1/backupstore
+      #backupTargetCredentialSecret: minio-secret
+      #createDefaultDiskLabeledNodes: true
+      #storageOverProvisioningPercentage: 600
+      #storageMinimalAvailablePercentage: 15
+      #defaultDataLocality: disabled
+      #defaultLonghornStaticStorageClass: longhorn-static-example
+      #backupstorePollInterval: 500
+      #taintToleration: key1=value1:NoSchedule; key2:NoExecute
+      #systemManagedComponentsNodeSelector: "label-key1:label-value1"
+      #volumeAttachmentRecoveryPolicy: never
+      #nodeDownPodDeletionPolicy: do-nothing
+      #guaranteedInstanceManagerCpu: 15
+      #orphanResourceAutoDeletion: ""
+      #orphanResourceAutoDeletionGracePeriod: 300
