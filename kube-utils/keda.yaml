@@ -1,0 +1,35 @@
+#---------------------------------------#
+#            HELM REPOSITORY            #
+#---------------------------------------#
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: keda-repo
+  namespace: kube-utils
+spec:
+  interval: 1m
+  url: https://kedacore.github.io/charts
+
+#----------------------------------------#
+#              HELM RELEASE              #
+#----------------------------------------#
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: keda-operator
+  namespace: kube-utils
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: keda
+      sourceRef:
+        kind: HelmRepository
+        name: keda-repo
+  targetNamespace: kube-utils
+  install:
+    createNamespace: false
+  values:
+    fullnameOverride: keda-controller
